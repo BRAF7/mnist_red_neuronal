@@ -136,7 +136,6 @@ def resolucion_2():
     # print(model.evaluate(x_test, y_test))
 
 
-
 def convolucional():
     # Model / data parameters
     #10 por las 10 neuronas
@@ -150,68 +149,27 @@ def convolucional():
     # Scale images to the [0, 1] range
     x_train = x_train.astype("float32") / 255
     x_test = x_test.astype("float32") / 255
-    # Make sure images have shape (28, 28, 1)
-    x_train = np.expand_dims(x_train, -1)
-    x_test = np.expand_dims(x_test, -1)
-    print("x_train shape:", x_train.shape)
-    print(x_train.shape[0], "train samples")
-    print(x_test.shape[0], "test samples")
-
-
-    # convert class vectors to binary class matrices
-    y_train = tf.keras.utils.to_categorical(y_train, num_classes)
-    y_test = tf.keras.utils.to_categorical(y_test, num_classes)
-    model = tf.keras.Sequential(
-    [
-        tf.keras.Input(shape=input_shape),
-        layers.Conv2D(32, kernel_size=(3, 3), activation="relu"),
-        layers.MaxPooling2D(pool_size=(2, 2)),
-        # layers.Conv2D(64, kernel_size=(3, 3), activation="relu"),
-        # layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Flatten(),
-        layers.Dropout(0.5),
-        layers.Dense(num_classes, activation="softmax"),
-    ]
-    )
-
-    model.summary()
-    batch_size = 128
-    epochs = 5
-
-    model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
-
-    historial = model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1)
-    score = model.evaluate(x_test, y_test, verbose=0)
-    print("Test loss:", score[0])
-    print("Test accuracy:", score[1])
-    return historial
-
-def convolucional2():
-    # Model / data parameters
-    #10 por las 10 neuronas
-    num_classes = 10
-    # tamaño de las imagenes
-    input_shape = (28, 28, 1)
-
-    # the data, split between train and test sets
-    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
-
-    # Scale images to the [0, 1] range
-    x_train = x_train.astype("float32") / 255
-    x_test = x_test.astype("float32") / 255
-
-
 
     # convert class vectors to binary class matrices
     y_train = tf.keras.utils.to_categorical(y_train)
     y_test = tf.keras.utils.to_categorical(y_test)
     model = tf.keras.Sequential(
     [
+        
         tf.keras.Input(shape=input_shape),
+        #primera capa
         layers.Conv2D(32, kernel_size=(3, 3), activation="relu"),
-        layers.MaxPooling2D(pool_size=(1, 1)),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        #segunda capa
+        layers.Conv2D(64, kernel_size=(3, 3), activation="relu"),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        # Hacemos un flatten para poder usar una red fully connected
+        #https://anderfernandez.com/blog/que-es-una-red-neuronal-convolucional-y-como-crearlaen-keras/
         layers.Flatten(),
+        #prevents overfitting
+        #https://keras.io/api/layers/regularization_layers/dropout/
         layers.Dropout(0.5),
+        # Añadimos una capa softmax para que podamos clasificar las imágenes
         layers.Dense(num_classes, activation="softmax"),
     ]
     )
@@ -230,16 +188,16 @@ def convolucional2():
 
 
 if __name__ == '__main__':
-    historial0 = convolucional2()
-    # historial1 = convolucional()
+    historial0 = convolucional()
+
     
-    historial1 = resolucion_1()
-    historial2 = resolucion_2()
+    # historial1 = resolucion_1()
+    # historial2 = resolucion_2()
     
-    plt.plot(historial1.history['loss'], label='Densa 1')
-    plt.legend()
-    plt.plot(historial2.history['loss'], label='Densa 2')
-    plt.legend()
+    # plt.plot(historial1.history['loss'], label='Densa 1')
+    # plt.legend()
+    # plt.plot(historial2.history['loss'], label='Densa 2')
+    # plt.legend()
     plt.plot(historial0.history['loss'], label='Convolucional')
     plt.legend()
     plt.xlabel("Epocas")
